@@ -25,12 +25,12 @@ export const parseArguments = (args: string[]): ArgumentParsingResult => {
 
     const day = parseInt(args[0], 10);
     if (!Number.isInteger(day) || day < 0) {
-        return { error: `Invalid value '${day}' for argument 'day'. 'day' must be a positive integer:` };
+        return { error: `Invalid value '${day}' for argument 'day'. 'day' must be a positive integer.` };
     }
 
     const part = parseInt(args[1], 10);
-    if (!Number.isInteger(part) || part < 0) {
-        return { error: `Invalid value '${part}' for argument 'part'. 'part' must be a positive integer:` };
+    if (!Number.isInteger(part) || part < 1 || part > 2) {
+        return { error: `Invalid value '${part}' for argument 'part'. Allowed values are '1' and '2'.` };
     }
 
     const test = args.length > 2 && (args[2] === '-t' || args[2] === '--test');
