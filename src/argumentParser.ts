@@ -10,8 +10,8 @@ interface Arguments {
     additionalArguments: string[]
 }
 
-export const parseArguments = (args: string[]): ArgumentParsingResult => {
-    if (args.some(arg => arg === '-h' || '--help')) {
+const parseArguments = (args: string[]): ArgumentParsingResult => {
+    if (args.some(arg => arg === '-h' || arg === '--help')) {
         return { };
     }
 
@@ -45,17 +45,22 @@ export const parseArguments = (args: string[]): ArgumentParsingResult => {
     }
 }
 
-export const showHelp = (message?: string) => {
+const showHelp = (message?: string) => {
     if (message) {
-        console.error(message);
+        console.log(`ERROR: ${message}`);
     }
 
     console.log('My Advent of Code project for 2023 in TypeSript');
     console.log('Usage: x <day> <part> [options] [additionalArguments]...');
-    console.log('\tday (required):\tSpecifies which days challenge to run.');
+    console.log('\tday (required): \tSpecifies which days challenge to run.');
     console.log('\tpart (required):\tSpecifies which part of the challenge to run.');
     console.log();
     console.log('Options:');
     console.log('\t-h, --help:\tDisplays this message.');
     console.log('\t-t, --test:\tSpecifies that the program should use the example data for the challenge as input.');
+}
+
+export default {
+    parseArguments,
+    showHelp
 }

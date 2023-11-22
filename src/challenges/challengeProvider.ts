@@ -1,5 +1,7 @@
-import EchoChallenge from './challenges/echo/main'
-import Challenge1 from './challenges/challenge1/main'
+import Challenge from './challenge.ts'
+import EchoChallenge from './echo/main.ts'
+
+import Challenge1 from './challenge1/main.ts'
 
 const challengeProvider = {
     getChallenge: (day: number): Challenge | undefined=> {
