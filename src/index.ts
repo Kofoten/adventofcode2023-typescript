@@ -2,13 +2,13 @@ import ArgumentParser, { Arguments } from './argumentParser.ts';
 import InputProvider from './input/inputProvider.ts';
 import ChallengeProvider from './challenges/challengeProvider.ts';
 
-const app = (args: Arguments): void => {
+const app = async (args: Arguments): Promise<void> => {
     const challengeFunction = ChallengeProvider.getChallengeFunction(args.day, args.part);
     if (!challengeFunction) {
         throw new Error(`No challenge could be found for day ${args.day}.`);
     }
 
-    const input = InputProvider.getInput(args.day, args.test);
+    const input = await InputProvider.getInput(args.day, args.test, args.sessionCookie);
     if (!input) {
         throw new Error(`Could not get input for the specified day ${args.day}.`);
     }
@@ -22,7 +22,7 @@ const parsingResult = ArgumentParser.parseArguments(args);
 
 if (parsingResult.arguments) {
     try {
-        app(parsingResult.arguments);
+        await app(parsingResult.arguments);
     } catch (error) {
         console.error(error);
         process.exit(42);

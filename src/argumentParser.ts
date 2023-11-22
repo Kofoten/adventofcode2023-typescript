@@ -6,7 +6,9 @@ interface ArgumentParsingResult {
 export interface Arguments {
     day: number;
     part: number;
-    test: boolean;
+    test?: boolean;
+    showHelp?: boolean;
+    sessionCookie?: string;
     additionalArguments: string[];
 }
 
@@ -33,16 +35,50 @@ const parseArguments = (args: string[]): ArgumentParsingResult => {
         return { error: `Invalid value '${part}' for argument 'part'. Allowed values are '1' and '2'.` };
     }
 
-    const test = args.length > 2 && (args[2] === '-t' || args[2] === '--test');
+    const result: Arguments = { day, part, additionalArguments: [] };
 
-    return {
-        arguments: {
-            day,
-            part,
-            test,
-            additionalArguments: args.slice(test ? 3 : 2),
-        },
-    };
+    let argumentCount = 2;
+    let currentOption = undefined;
+    for (let i = 2; i < args.length; i++) {
+        if (args[i].startsWith('-')) {
+            switch (args[i]) {
+                case '-t':
+                case '--test':
+                    result.test = true;
+                    break;
+                case '-h':
+                case '--help':
+                    result.showHelp = true;
+                    break;
+                default:
+                    break;
+            }
+
+            currentOption = args[i];
+        } else {
+            switch (currentOption) {
+                case '--set-session-cookie':
+                    {
+                        const sessionCookie = parseSessionCookie(args[i]);
+                        if (!sessionCookie) {
+                            return { error: `Invalid value '${args[i]}' for option '--set-session-cookie'.` };
+                        }
+
+                        result.sessionCookie = sessionCookie;
+                        currentOption = undefined;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        argumentCount++;
+    }
+
+    result.additionalArguments = args.slice(argumentCount);
+
+    return { arguments: result };
 };
 
 const showHelp = (message?: string) => {
@@ -58,6 +94,19 @@ const showHelp = (message?: string) => {
     console.log('Options:');
     console.log('\t-h, --help:\tDisplays this message.');
     console.log('\t-t, --test:\tSpecifies that the program should use the example data for the challenge as input.');
+    console.log(
+        '\t--set-session-cookie:\tSets a sessioncookie value to use when authenticating. This is only required when the cookie changes.'
+    );
+};
+
+const parseSessionCookie = (value: string): string | undefined => {
+    const regexp = /^(session=)?([0-9A-Fa-f]+);?$/;
+    const match = regexp.exec(value);
+    if (match === null) {
+        return undefined;
+    }
+
+    return match[2];
 };
 
 export default {
