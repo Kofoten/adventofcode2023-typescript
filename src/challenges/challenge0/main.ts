@@ -1,4 +1,4 @@
-import Challenge from "../challenge.ts";
+import Challenge from '../challenge.ts';
 
 const challenge: Challenge = {
     part1: (input: string): string => input,
