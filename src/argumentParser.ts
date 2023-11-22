@@ -1,18 +1,18 @@
 interface ArgumentParsingResult {
-    arguments?: Arguments,
-    error?: string,
+    arguments?: Arguments;
+    error?: string;
 }
 
-interface Arguments {
-    day: number,
-    part: number,
-    test: boolean,
-    additionalArguments: string[]
+export interface Arguments {
+    day: number;
+    part: number;
+    test: boolean;
+    additionalArguments: string[];
 }
 
 const parseArguments = (args: string[]): ArgumentParsingResult => {
-    if (args.some(arg => arg === '-h' || arg === '--help')) {
-        return { };
+    if (args.some((arg) => arg === '-h' || arg === '--help')) {
+        return {};
     }
 
     if (args.length < 2) {
@@ -41,9 +41,9 @@ const parseArguments = (args: string[]): ArgumentParsingResult => {
             part,
             test,
             additionalArguments: args.slice(test ? 3 : 2),
-        }
-    }
-}
+        },
+    };
+};
 
 const showHelp = (message?: string) => {
     if (message) {
@@ -58,9 +58,9 @@ const showHelp = (message?: string) => {
     console.log('Options:');
     console.log('\t-h, --help:\tDisplays this message.');
     console.log('\t-t, --test:\tSpecifies that the program should use the example data for the challenge as input.');
-}
+};
 
 export default {
     parseArguments,
-    showHelp
-}
+    showHelp,
+};

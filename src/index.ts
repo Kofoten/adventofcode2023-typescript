@@ -1,28 +1,30 @@
-import ArgumentParser from './argumentParser.ts';
+import ArgumentParser, { Arguments } from './argumentParser.ts';
 import InputProvider from './input/inputProvider.ts';
 import ChallengeProvider from './challenges/challengeProvider.ts';
+
+const app = (args: Arguments): void => {
+    const challengeFunction = ChallengeProvider.getChallengeFunction(args.day, args.part);
+    if (!challengeFunction) {
+        throw new Error(`No challenge could be found for day ${args.day}.`);
+    }
+
+    const input = InputProvider.getInput(args.day, args.test);
+    if (!input) {
+        throw new Error(`Could not get input for the specified day ${args.day}.`);
+    }
+
+    const result = challengeFunction(input, args.additionalArguments);
+    console.log(result);
+};
 
 const args = process.argv.slice(2);
 const parsingResult = ArgumentParser.parseArguments(args);
 
 if (parsingResult.arguments) {
-    const challenge = ChallengeProvider.getChallenge(parsingResult.arguments.day)
-    if (challenge) {
-        const input = InputProvider.getInput(
-            parsingResult.arguments.day,
-            parsingResult.arguments.part,
-            parsingResult.arguments.test);
-
-        let result = '?';
-        if (parsingResult.arguments.part === 1) {
-            result = challenge.part1(input);
-        } else {
-            result = challenge.part2(input);
-        }
-
-        console.log(result);
-    } else {
-        ArgumentParser.showHelp(`No challenge could be found for day ${parsingResult.arguments.day}.`);
+    try {
+        app(parsingResult.arguments);
+    } catch (error) {
+        console.error(error);
         process.exit(42);
     }
 } else {

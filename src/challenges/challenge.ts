@@ -1,6 +1,6 @@
-type PartFunction = (input: string, args?: string[]) => string
+export type ChallengePartFunction = (input: string, args?: string[]) => string;
 
 export default interface Challenge {
-    part1: PartFunction
-    part2: PartFunction
+    part1: ChallengePartFunction;
+    part2: ChallengePartFunction;
 }
