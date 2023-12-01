@@ -1,11 +1,16 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
-import aocClient from "../io/aocClient.ts";
+import aocClient from '../io/aocClient.ts';
 import { getAocCachePath } from '../common/utilities.ts';
 
 const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };
 
-const getInput = async (day: number, part: number, test?: boolean, sessionCookie?: string): Promise<string | undefined> => {
+const getInput = async (
+    day: number,
+    part: number,
+    test?: boolean,
+    sessionCookie?: string
+): Promise<string | undefined> => {
     if (test) {
         return getTestInput(day, part);
     } else {
@@ -27,7 +32,7 @@ const getTestInput = (day: number, part: number): string | undefined => {
     }
 
     return undefined;
-}
+};
 
 const getInputInner = async (day: number, sessionCookie?: string) => {
     const path = getCachePath(day);
@@ -38,7 +43,7 @@ const getInputInner = async (day: number, sessionCookie?: string) => {
         writeFileSync(path, data, { encoding: 'utf8' });
         return data;
     }
-}
+};
 
 const getCachePath = (day: number): URL => {
     const aocPath = getAocCachePath();

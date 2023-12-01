@@ -1,6 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import path from "path";
-import { getAocCachePath } from "../common/utilities.ts";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import path from 'path';
+import { getAocCachePath } from '../common/utilities.ts';
 
 const YEAR = 2023;
 const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };
@@ -11,6 +11,13 @@ const fetchInput = async (day: number, sessionCookie?: string): Promise<string> 
     const headers = new Headers();
     authenticate(headers, sessionCookie);
     const options = { method: 'GET', headers };
+
+    // Day zero is a framework test day. Returning 'Hello World!' right before the request is sent to go through as
+    // much code as possible without relying on external dependencies. The ability to cache the session cookie should
+    // also still be supported without sending any request.
+    if (day === 0) {
+        return 'Hello World!';
+    }
 
     const response = await fetch(url, options);
 
@@ -40,5 +47,5 @@ const authenticate = (headers: Headers, sessionCookie?: string): void => {
 };
 
 export default {
-    fetchInput
-}
+    fetchInput,
+};
