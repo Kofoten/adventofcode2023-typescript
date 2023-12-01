@@ -1,0 +1,44 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import path from "path";
+import { getAocCachePath } from "../common/utilities.ts";
+
+const YEAR = 2023;
+const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };
+
+const fetchInput = async (day: number, sessionCookie?: string): Promise<string> => {
+    const url = new URL(`https://adventofcode.com/${YEAR}/day/${day}/input`);
+
+    const headers = new Headers();
+    authenticate(headers, sessionCookie);
+    const options = { method: 'GET', headers };
+
+    const response = await fetch(url, options);
+
+    if (response.ok) {
+        return await response.text();
+    } else {
+        throw new Error(`${response.status} ${response.statusText}`);
+    }
+};
+
+const authenticate = (headers: Headers, sessionCookie?: string): void => {
+    const aocPath = getAocCachePath();
+    if (!existsSync(aocPath)) {
+        mkdirSync(aocPath);
+    }
+
+    const cacheFile = path.join(aocPath, 'session');
+    if (sessionCookie) {
+        writeFileSync(cacheFile, sessionCookie, FILE_OPTIONS);
+    } else if (existsSync(cacheFile)) {
+        sessionCookie = readFileSync(cacheFile, FILE_OPTIONS);
+    } else {
+        throw new Error('No session cookie found. Can not authenticate to AoC.');
+    }
+
+    headers.append('Cookie', `session=${sessionCookie}`);
+};
+
+export default {
+    fetchInput
+}

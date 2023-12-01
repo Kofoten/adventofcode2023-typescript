@@ -1,78 +1,57 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
-import { homedir } from 'os';
 import path from 'path';
+import aocClient from "../io/aocClient.ts";
+import { getAocCachePath } from '../common/utilities.ts';
 
-const YEAR = 2023;
+const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };
 
-const getInput = async (day: number, test?: boolean, sessionCookie?: string): Promise<string | undefined> => {
-    const path = getCachePath(day, test);
+const getInput = async (day: number, part: number, test?: boolean, sessionCookie?: string): Promise<string | undefined> => {
+    if (test) {
+        return getTestInput(day, part);
+    } else {
+        return getInputInner(day, sessionCookie);
+    }
+};
+
+const getTestInput = (day: number, part: number): string | undefined => {
+    const dayString = getDayString(day);
+    const potentialPaths = [
+        new URL(`./testdata/day${dayString}.txt`, import.meta.url),
+        new URL(`./testdata/day${dayString}p${part}.txt`, import.meta.url),
+    ];
+
+    for (let i = 0; i < potentialPaths.length; i++) {
+        if (existsSync(potentialPaths[i])) {
+            return readFileSync(potentialPaths[i], FILE_OPTIONS);
+        }
+    }
+
+    return undefined;
+}
+
+const getInputInner = async (day: number, sessionCookie?: string) => {
+    const path = getCachePath(day);
     if (existsSync(path)) {
         return readFileSync(path, { encoding: 'utf8' });
-    } else if (!test) {
-        const data = await fetchInput(day, sessionCookie);
+    } else {
+        const data = await aocClient.fetchInput(day, sessionCookie);
         writeFileSync(path, data, { encoding: 'utf8' });
         return data;
-    } else {
-        return undefined;
     }
-};
+}
 
-const fetchInput = async (day: number, sessionCookie?: string): Promise<string> => {
-    const url = new URL(`https://adventofcode.com/${YEAR}/day/${day}/input`);
-
-    const headers = new Headers();
-    authenticate(headers, sessionCookie);
-    const options = { method: 'GET', headers };
-
-    const response = await fetch(url, options);
-
-    if (response.ok) {
-        return await response.text();
-    } else {
-        throw new Error(`${response.status} ${response.statusText}`);
-    }
-};
-
-const authenticate = (headers: Headers, sessionCookie?: string): void => {
-    const aocPath = getAocPath();
-    if (!existsSync(aocPath)) {
-        mkdirSync(aocPath);
-    }
-
-    const cacheFile = path.join(aocPath, 'session');
-    if (sessionCookie) {
-        writeFileSync(cacheFile, sessionCookie, { encoding: 'utf8' });
-    } else if (existsSync(cacheFile)) {
-        sessionCookie = readFileSync(cacheFile, { encoding: 'utf8' });
-    } else {
-        throw new Error('No session cookie found. Can not authenticate to AoC.');
-    }
-
-    headers.append('Cookie', `session=${sessionCookie}`);
-};
-
-const getCachePath = (day: number, test?: boolean): URL => {
-    if (test) {
-        return new URL(`./testdata/day${day}.txt`, import.meta.url);
-    }
-
-    const aocPath = getAocPath();
+const getCachePath = (day: number): URL => {
+    const aocPath = getAocCachePath();
     const cacheDir = path.join(aocPath, 'cache');
     if (!existsSync(cacheDir)) {
         mkdirSync(cacheDir);
     }
 
-    return new URL(`file://${path.join(cacheDir, `challenge-input-${day}.txt`)}`);
+    const dayString = getDayString(day);
+    return new URL(`file://${path.join(cacheDir, `challenge-input-${dayString}.txt`)}`);
 };
 
-const getAocPath = (): string => {
-    const aocDir = path.join(homedir(), '.aoc');
-    if (!existsSync(aocDir)) {
-        mkdirSync(aocDir);
-    }
-
-    return aocDir;
-};
+const getDayString = (day: number): string => day.toString().padStart(2, '0');
 
 export default {
     getInput,

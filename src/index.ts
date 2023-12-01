@@ -8,7 +8,7 @@ const app = async (args: Arguments): Promise<void> => {
         throw new Error(`No challenge could be found for day ${args.day}.`);
     }
 
-    const input = await InputProvider.getInput(args.day, args.test, args.sessionCookie);
+    const input = await InputProvider.getInput(args.day, args.part, args.test, args.sessionCookie);
     if (!input) {
         throw new Error(`Could not get input for the specified day ${args.day}.`);
     }
