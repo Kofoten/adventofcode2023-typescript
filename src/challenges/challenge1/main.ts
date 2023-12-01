@@ -15,8 +15,6 @@ const getFirstAndLastDigits = (line: string): number => {
                 val = 1;
             } else if (lbcache.endsWith('two')) {
                 val = 2;
-            } else if (lbcache.endsWith('two')) {
-                val = 2;
             } else if (lbcache.endsWith('three')) {
                 val = 3;
             } else if (lbcache.endsWith('four')) {
@@ -34,6 +32,8 @@ const getFirstAndLastDigits = (line: string): number => {
             } else {
                 continue;
             }
+        } else {
+            lbcache = '';
         }
 
         if (Number.isNaN(first)) {
