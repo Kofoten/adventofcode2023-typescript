@@ -1,1 +1,1 @@
-src/input/testdata/*.txt text eol=lf
+src/example-input/*.txt text eol=lf

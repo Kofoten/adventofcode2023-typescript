@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import { getAocCachePath } from '../common/utilities.ts';
+import { getAocCachePath } from './utilities.ts';
 
 const YEAR = 2023;
 const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };

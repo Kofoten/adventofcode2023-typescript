@@ -1,5 +1,5 @@
 import ArgumentParser, { Arguments } from './argumentParser.ts';
-import InputProvider from './input/inputProvider.ts';
+import InputProvider from './inputProvider.ts';
 import ChallengeProvider from './challenges/challengeProvider.ts';
 
 const app = async (args: Arguments): Promise<void> => {

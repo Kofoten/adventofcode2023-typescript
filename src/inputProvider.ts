@@ -1,7 +1,7 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
-import aocClient from '../io/aocClient.ts';
-import { getAocCachePath } from '../common/utilities.ts';
+import aocClient from './aocClient.ts';
+import { getAocCachePath } from './utilities.ts';
 
 const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };
 
@@ -21,8 +21,8 @@ const getInput = async (
 const getTestInput = (day: number, part: number): string | undefined => {
     const dayString = getDayString(day);
     const potentialPaths = [
-        new URL(`./testdata/day${dayString}.txt`, import.meta.url),
-        new URL(`./testdata/day${dayString}p${part}.txt`, import.meta.url),
+        new URL(`./example-input/day${dayString}.txt`, import.meta.url),
+        new URL(`./example-input/day${dayString}p${part}.txt`, import.meta.url),
     ];
 
     for (let i = 0; i < potentialPaths.length; i++) {
