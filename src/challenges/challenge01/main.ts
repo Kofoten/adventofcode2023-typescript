@@ -134,8 +134,8 @@ const getLastDigit = (text: string, matchOnlyDigits?: boolean): number => {
 const challenge: Challenge = {
     part1: (input: string): string =>
         input
+            .trimEnd()
             .split('\n')
-            .filter((line) => line.length > 0)
             .map((line) => {
                 line = line.trimEnd();
                 let first = getFirstDigit(line, true);
@@ -146,8 +146,8 @@ const challenge: Challenge = {
             .toString(),
     part2: (input: string): string =>
         input
+            .trimEnd()
             .split('\n')
-            .filter((line) => line.length > 0)
             .map((line) => {
                 line = line.trimEnd();
                 let first = getFirstDigit(line, false);
