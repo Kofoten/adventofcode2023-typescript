@@ -1,6 +1,6 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
-import aocClient from './aocClient.ts';
+import aocClient from './aoc-client.ts';
 import { getAocCachePath } from './utilities.ts';
 
 const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };

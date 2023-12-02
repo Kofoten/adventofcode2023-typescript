@@ -1,6 +1,6 @@
-import ArgumentParser, { Arguments } from './argumentParser.ts';
-import InputProvider from './inputProvider.ts';
-import ChallengeProvider from './challenges/challengeProvider.ts';
+import ArgumentParser, { Arguments } from './argument-parser.ts';
+import InputProvider from './input-provider.ts';
+import ChallengeProvider from './challenges/challenge-provider.ts';
 
 const app = async (args: Arguments): Promise<void> => {
     const challengeFunction = ChallengeProvider.getChallengeFunction(args.day, args.part);
