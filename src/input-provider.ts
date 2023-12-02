@@ -1,9 +1,9 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import aocClient from './aoc-client.ts';
-import { getAocCachePath } from './utilities.ts';
+import { FO, getAocCachePath } from './utilities.ts';
 
-const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };
+const FILE_OPTIONS: FO = { encoding: 'utf8' };
 
 const getInput = async (
     day: number,

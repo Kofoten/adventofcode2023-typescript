@@ -1,9 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import { getAocCachePath } from './utilities.ts';
+import { FO, getAocCachePath } from './utilities.ts';
 
 const YEAR = 2023;
-const FILE_OPTIONS: { encoding: BufferEncoding } = { encoding: 'utf8' };
+const FILE_OPTIONS: FO = { encoding: 'utf8' };
 
 const fetchInput = async (day: number, sessionCookie?: string): Promise<string> => {
     const url = new URL(`https://adventofcode.com/${YEAR}/day/${day}/input`);
@@ -28,6 +28,10 @@ const fetchInput = async (day: number, sessionCookie?: string): Promise<string> 
     }
 };
 
+const sendAnswer = async (day: number, part: number, answer: string): Promise<boolean> => {
+    throw new Error('Not implemented');
+};
+
 const authenticate = (headers: Headers, sessionCookie?: string): void => {
     const aocPath = getAocCachePath();
     if (!existsSync(aocPath)) {
@@ -48,4 +52,5 @@ const authenticate = (headers: Headers, sessionCookie?: string): void => {
 
 export default {
     fetchInput,
+    sendAnswer,
 };
