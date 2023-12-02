@@ -1,15 +1,18 @@
 import Challenge, { ChallengePartFunction } from './challenge.ts';
 
 // Challenge Implementations
-import Challenge0 from './challenge0/main.ts';
-import Challenge1 from './challenge1/main.ts';
+import Challenge00 from './challenge00/main.ts';
+import Challenge01 from './challenge01/main.ts';
+import Challenge02 from './challenge02/main.ts';
 
 const getChallenge = (day: number): Challenge | undefined => {
     switch (day) {
         case 0:
-            return Challenge0;
+            return Challenge00;
         case 1:
-            return Challenge1;
+            return Challenge01;
+        case 2:
+            return Challenge02;
         default:
             return undefined;
     }

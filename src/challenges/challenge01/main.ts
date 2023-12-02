@@ -131,13 +131,6 @@ const getLastDigit = (text: string, matchOnlyDigits?: boolean): number => {
     return NaN;
 };
 
-const getFirstAndLastDigits = (line: string): number => {
-    let first = getFirstDigit(line, true);
-    let last = getLastDigit(line);
-
-    return first * 10 + last;
-};
-
 const challenge: Challenge = {
     part1: (input: string): string =>
         input
