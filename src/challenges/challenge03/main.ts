@@ -1,12 +1,12 @@
 import Challenge from '../challenge.ts';
 
-interface Symbol {
+interface PartSymbol {
     value: string;
     row: number;
     col: number;
 }
 
-const getAdjecentSymbol = (lines: string[], row: number, left: number, right: number): Symbol | undefined => {
+const getAdjecentSymbol = (lines: string[], row: number, left: number, right: number): PartSymbol | undefined => {
     if (left >= 0 && lines[row][left] !== '.') {
         return {
             value: lines[row][left],
