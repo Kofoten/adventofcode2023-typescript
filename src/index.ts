@@ -13,7 +13,9 @@ const app = async (args: Arguments): Promise<void> => {
         throw new Error(`Could not get input for the specified day ${args.day}.`);
     }
 
+    console.time('execution_time')
     const result = challengeFunction(input, args.additionalArguments);
+    console.timeEnd('execution_time')
     console.log(result);
 };
 
