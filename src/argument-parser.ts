@@ -37,8 +37,6 @@ const parseArguments = (args: string[]): ArgumentParsingResult => {
 
     const result: Arguments = { day, part, additionalArguments: [] };
 
-    let argumentCount = 2;
-    let currentOption = undefined;
     for (let i = 2; i < args.length; i++) {
         if (args[i].startsWith('-')) {
             switch (args[i]) {
@@ -50,33 +48,26 @@ const parseArguments = (args: string[]): ArgumentParsingResult => {
                 case '--help':
                     result.showHelp = true;
                     break;
-                default:
-                    break;
-            }
-
-            currentOption = args[i];
-        } else {
-            switch (currentOption) {
                 case '--set-session-cookie':
                     {
+                        i++;
+                        if (args[i] === undefined) {
+                            return { error: `--set-session-cookie requires a parameter.` };
+                        }
                         const sessionCookie = parseSessionCookie(args[i]);
                         if (!sessionCookie) {
                             return { error: `Invalid value '${args[i]}' for option '--set-session-cookie'.` };
                         }
 
                         result.sessionCookie = sessionCookie;
-                        currentOption = undefined;
                     }
                     break;
                 default:
+                    result.additionalArguments.push(args[i]);
                     break;
             }
         }
-
-        argumentCount++;
     }
-
-    result.additionalArguments = args.slice(argumentCount);
 
     return { arguments: result };
 };
