@@ -33,7 +33,8 @@ const readInput = (input: string, expansionRate: number): Point[] => {
         .sort((a, b) => a.x - b.x)
         .forEach((point) => {
             const diff = point.x - lastX;
-            if (diff > 1) {
+
+            for (let i = 1; i < diff; i++) {
                 xOffset += expansionRate;
             }
 
