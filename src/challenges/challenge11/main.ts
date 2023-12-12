@@ -5,7 +5,7 @@ interface Point {
     y: number;
 }
 
-const readInput = (input: string, expansionRate: number): Point[] => {
+const calculateDistances = (input: string, expansionRate: number): number => {
     const galaxies: Point[] = [];
     let yOffset = 0;
 
@@ -42,38 +42,22 @@ const readInput = (input: string, expansionRate: number): Point[] => {
             point.x = point.x + xOffset;
         });
 
-    return galaxies;
+    const distances: number[] = [];
+    for (let i = 0; i < galaxies.length; i++) {
+        for (let j = 1 + i; j < galaxies.length; j++) {
+            const xDist = Math.abs(galaxies[i].x - galaxies[j].x);
+            const yDist = Math.abs(galaxies[i].y - galaxies[j].y);
+            distances.push(xDist + yDist);
+        }
+    }
+
+    const answer = distances.reduce((acc, val) => acc + val);
+    return answer;
 };
 
 const challenge: Challenge = {
-    part1: (input: string): string => {
-        const galaxies = readInput(input, 1);
-        const distances: number[] = [];
-        for (let i = 0; i < galaxies.length; i++) {
-            for (let j = 1 + i; j < galaxies.length; j++) {
-                const xDist = Math.abs(galaxies[i].x - galaxies[j].x);
-                const yDist = Math.abs(galaxies[i].y - galaxies[j].y);
-                distances.push(xDist + yDist);
-            }
-        }
-
-        const answer = distances.reduce((acc, val) => acc + val);
-        return answer.toString();
-    },
-    part2: (input: string): string => {
-        const galaxies = readInput(input, 999999);
-        const distances: number[] = [];
-        for (let i = 0; i < galaxies.length; i++) {
-            for (let j = 1 + i; j < galaxies.length; j++) {
-                const xDist = Math.abs(galaxies[i].x - galaxies[j].x);
-                const yDist = Math.abs(galaxies[i].y - galaxies[j].y);
-                distances.push(xDist + yDist);
-            }
-        }
-
-        const answer = distances.reduce((acc, val) => acc + val);
-        return answer.toString();
-    },
+    part1: (input: string): string => calculateDistances(input, 1).toString(),
+    part2: (input: string): string => calculateDistances(input, 999999).toString(),
 };
 
 export default challenge;
