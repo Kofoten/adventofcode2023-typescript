@@ -34,19 +34,7 @@ const parseInput = (input: string): Pattern[] => {
     });
 };
 
-const isMirrorAtIndex = (pattern: number[], index: number): boolean => {
-    for (let i = 0; ; i++) {
-        const leftIndex = index - i;
-        const rightIndex = 1 + index + i;
-        const left = pattern[leftIndex];
-        const right = pattern[rightIndex];
-        if (left !== right) {
-            return left === undefined || right === undefined;
-        }
-    }
-};
-
-const isMirrorAtIndexSmudgeCorrection = (pattern: number[], index: number): boolean => {
+const isMirrorAtIndex = (pattern: number[], index: number, useSmudgeCorrection: boolean): boolean => {
     let smudgeCorrected = false;
     for (let i = 0; ; i++) {
         const leftIndex = index - i;
@@ -55,12 +43,16 @@ const isMirrorAtIndexSmudgeCorrection = (pattern: number[], index: number): bool
         const right = pattern[rightIndex];
         const x = left ^ right;
         if (left !== right) {
-            if (left === undefined || right === undefined) {
-                return smudgeCorrected;
-            } else if ((x & (x - 1)) === 0) {
-                smudgeCorrected = true;
+            if (useSmudgeCorrection) {
+                if (left === undefined || right === undefined) {
+                    return smudgeCorrected;
+                } else if ((x & (x - 1)) === 0) {
+                    smudgeCorrected = true;
+                } else {
+                    return false;
+                }
             } else {
-                return false;
+                return left === undefined || right === undefined;
             }
         }
     }
@@ -73,7 +65,7 @@ const challenge: Challenge = {
             const maxH = pattern.horizontal.length - 1;
             let rowsValue = 0;
             for (let i = 0; i < maxH; i++) {
-                if (isMirrorAtIndex(pattern.horizontal, i)) {
+                if (isMirrorAtIndex(pattern.horizontal, i, false)) {
                     rowsValue = (i + 1) * 100;
                     break;
                 }
@@ -82,7 +74,7 @@ const challenge: Challenge = {
             const maxV = pattern.vertical.length - 1;
             let colsValue = 0;
             for (let i = 0; i < maxV; i++) {
-                if (isMirrorAtIndex(pattern.vertical, i)) {
+                if (isMirrorAtIndex(pattern.vertical, i, false)) {
                     colsValue = i + 1;
                     break;
                 }
@@ -98,7 +90,7 @@ const challenge: Challenge = {
             const maxH = pattern.horizontal.length - 1;
             let rowsValue = 0;
             for (let i = 0; i < maxH; i++) {
-                if (isMirrorAtIndexSmudgeCorrection(pattern.horizontal, i)) {
+                if (isMirrorAtIndex(pattern.horizontal, i, true)) {
                     rowsValue = (i + 1) * 100;
                     break;
                 }
@@ -107,7 +99,7 @@ const challenge: Challenge = {
             const maxV = pattern.vertical.length - 1;
             let colsValue = 0;
             for (let i = 0; i < maxV; i++) {
-                if (isMirrorAtIndexSmudgeCorrection(pattern.vertical, i)) {
+                if (isMirrorAtIndex(pattern.vertical, i, true)) {
                     colsValue = i + 1;
                     break;
                 }
