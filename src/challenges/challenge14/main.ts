@@ -55,21 +55,52 @@ const challenge: Challenge = {
             .split('\n')
             .map((line) => line.split(''));
 
-        for (let l = 0; l < 1000000000; l++) {
-            map.forEach((line, i) => {
-                for (let j = 0; j < line.length; j++) {
-                    if (line[j] === 'O') {
-                        map[i][j] = '.';
-                        for (let k = i; k >= 0; k--) {
-                            if (map[k - 1] === undefined || map[k - 1][j] !== '.') {
-                                map[k][j] = 'O';
-                                break;
+        const mem: string[] = [];
+
+        let remainingCycles = 0;
+        for (let l = 0; remainingCycles === 0; l++) {
+            for (let c = 0; c < 4; c++) {
+                map.forEach((line, i) => {
+                    for (let j = 0; j < line.length; j++) {
+                        if (line[j] === 'O') {
+                            map[i][j] = '.';
+                            for (let k = i; k >= 0; k--) {
+                                if (map[k - 1] === undefined || map[k - 1][j] !== '.') {
+                                    map[k][j] = 'O';
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-            });
-            map = rotateRight(map);
+                });
+                map = rotateRight(map);
+            }
+
+            const memStr = map.reduce((str, val) => str + val.reduce((s, r) => s + r, ''), '');
+            const memIdx = mem.findIndex((x) => x === memStr);
+            if (memIdx !== -1) {
+                remainingCycles = (1000000000 - memIdx) % (l - memIdx);
+            }
+            mem.push(memStr);
+        }
+
+        for (let l = 1; l < remainingCycles; l++) {
+            for (let c = 0; c < 4; c++) {
+                map.forEach((line, i) => {
+                    for (let j = 0; j < line.length; j++) {
+                        if (line[j] === 'O') {
+                            map[i][j] = '.';
+                            for (let k = i; k >= 0; k--) {
+                                if (map[k - 1] === undefined || map[k - 1][j] !== '.') {
+                                    map[k][j] = 'O';
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+                map = rotateRight(map);
+            }
         }
 
         const answer = calculateAnswer(map);
