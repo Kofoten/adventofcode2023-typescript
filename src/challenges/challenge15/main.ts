@@ -2,11 +2,11 @@ import Challenge from '../challenge.ts';
 
 interface Lens {
     slot: number;
-    power: number;
+    focalLength: number;
 }
 
 interface Box {
-    last: number;
+    lastSlot: number;
     lenses: { [key: string]: Lens };
 }
 
@@ -34,7 +34,7 @@ const challenge: Challenge = {
         const boxes: Box[] = [];
 
         for (let i = 0; i < 256; i++) {
-            boxes[i] = { last: -1, lenses: {} };
+            boxes[i] = { lastSlot: -1, lenses: {} };
         }
 
         input
@@ -45,17 +45,18 @@ const challenge: Challenge = {
                 if (match) {
                     const label = match[1];
                     const boxIndex = computeHash(label);
+                    const box = boxes[boxIndex];
                     switch (match[2]) {
                         case '-':
-                            delete boxes[boxIndex].lenses[label];
+                            delete box.lenses[label];
                             break;
                         case '=':
-                            const power = parseInt(match[3], 10);
-                            if (boxes[boxIndex].lenses[label]) {
-                                boxes[boxIndex].lenses[label].power = power;
+                            const focalLength = parseInt(match[3], 10);
+                            if (box.lenses[label]) {
+                                box.lenses[label].focalLength = focalLength;
                             } else {
-                                boxes[boxIndex].last++;
-                                boxes[boxIndex].lenses[label] = { slot: boxes[boxIndex].last, power };
+                                box.lastSlot++;
+                                box.lenses[label] = { slot: box.lastSlot, focalLength };
                             }
                             break;
                         default:
@@ -66,8 +67,7 @@ const challenge: Challenge = {
 
         const answer = boxes.reduce((sum, box, i) => {
             const orderedLenses = Object.values(box.lenses).sort((a, b) => a.slot - b.slot);
-            const boxMultiplier = 1 + i;
-            const lensPowers = orderedLenses.map((lens, slot) => boxMultiplier * (1 + slot) * lens.power);
+            const lensPowers = orderedLenses.map((lens, slot) => (1 + i) * (1 + slot) * lens.focalLength);
             return sum + lensPowers.reduce((acc, lp) => acc + lp, 0);
         }, 0);
 
