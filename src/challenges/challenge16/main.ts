@@ -10,12 +10,15 @@ interface LightBeam {
     direction: Vector2;
 }
 
-interface ComputedBeam {
-    lightMap: { [key: number]: any };
-    next: LightBeam[];
+interface LightMap {
+    [key: number]: any;
 }
 
-type CacheBeam = LightBeam & ComputedBeam;
+interface BeamCache {
+    [key: string]: { [key: number]: any };
+}
+
+type Split = Vector2 & { type: '-' | '|' };
 
 const addVector2 = (left: Vector2, right: Vector2): Vector2 => ({ x: left.x + right.x, y: left.y + right.y });
 const toStringVector2 = (vec: Vector2): string => `${vec.x},${vec.y}`;
@@ -60,33 +63,68 @@ const splitOrTurnBeamBeam = (position: Vector2, direction: Vector2, object: stri
     return beams;
 };
 
-const computeBeam = (beam: LightBeam, map: string[][]): ComputedBeam => {
+const computeBeam = (
+    beam: LightBeam,
+    map: string[][],
+    cache: BeamCache /*, memory?: { [key: string]: any }*/
+): LightMap => {
+    //if (!memory) {
+    //    memory = {};
+    //}
+
+    const beamKey = toStringLightBeam(beam);
+    if (cache[beamKey]) {
+        return cache[beamKey];
+    }
+
+    //if (memory[beamKey]) {
+    //    return {};
+    //}
+
+    //memory[beamKey] = true;
+
+    let lightMap: LightMap = {};
+    let direction = { ...beam.direction };
     let position = { ...beam.start };
-    const result: ComputedBeam = { lightMap: {}, next: [] };
     while (true) {
-        position = addVector2(position, beam.direction);
+        position = addVector2(position, direction);
         if (map[position.y] === undefined || map[position.y][position.x] === undefined) {
-            return result;
+            break;
         }
 
-        const lightKey = position.x * 1000 + position.y;
-        result.lightMap[lightKey] = true;
+        lightMap[position.x * 1000 + position.y] = true;
 
-        if (map[position.y][position.x] !== '.') {
+        const tile = map[position.y][position.x];
+        if (tile !== '.') {
             // If travelling on Y axis and non dot is '|'
-            if (beam.direction.y !== 0 && map[position.y][position.x] !== '|') {
-                break;
+            if (direction.y !== 0 && tile === '|') {
+                continue;
             }
 
             // If travelling on X axis and non dot is '-'
-            if (beam.direction.x !== 0 && map[position.y][position.x] !== '-') {
+            if (direction.x !== 0 && tile === '-') {
+                continue;
+            }
+
+            const beams = splitOrTurnBeamBeam(position, direction, tile);
+            if (beams.length === 0) {
                 break;
+            } else if (beams.length === 1) {
+                direction = beams[0].direction;
+            } else if (beams.length === 2) {
+                const leftLightMap = computeBeam(beams[0], map, cache /*, memory*/);
+                const rightLightMap = computeBeam(beams[1], map, cache /*, memory*/);
+                const innerLightMap = { ...leftLightMap, ...rightLightMap };
+                lightMap = { ...lightMap, ...innerLightMap };
+                break;
+            } else {
+                throw new Error('WTF!');
             }
         }
     }
 
-    result.next = splitOrTurnBeamBeam(position, beam.direction, map[position.y][position.x]);
-    return result;
+    cache[beamKey] = lightMap;
+    return lightMap;
 };
 
 const getStart = (dir: number, index: number, size: number): LightBeam => {
@@ -116,8 +154,13 @@ const challenge: Challenge = {
             lightMap[i] = Array(map[i].length).fill(false);
         }
 
+        const cache: BeamCache = {};
+        const start = { start: { x: -1, y: 0 }, direction: { x: 1, y: 0 } };
+        const lm2 = computeBeam(start, map, cache);
+        const ans = Object.keys(lm2).length;
+
         const memory: string[] = [];
-        const queue: LightBeam[] = [{ start: { x: -1, y: 0 }, direction: { x: 1, y: 0 } }];
+        const queue: LightBeam[] = [start];
         while (queue.length > 0) {
             const beam = queue.pop()!;
             let position = { ...beam.start };
@@ -174,43 +217,23 @@ const challenge: Challenge = {
             .split('\n')
             .map((line) => line.split(''));
 
-        const counts: { key: string; count: number }[] = [];
-        const cache: { [key: string]: CacheBeam } = {};
+        const splits: Split[] = [];
+        for (let y = 0; y < map.length; y++) {
+            for (let x = 0; x < map[y].length; x++) {
+                const type = map[y][x];
+                if (type === '-' || type === '|') {
+                    splits.push({ y, x, type });
+                }
+            }
+        }
+
+        const cache: BeamCache = {};
+        const counts: { start: LightBeam; count: number }[] = [];
         for (let dir = 0; dir < 4; dir++) {
             for (let i = 0; i < map.length; i++) {
-                const memory: { [key: string]: any } = {};
                 const start = getStart(dir, i, map.length);
-                const queue: LightBeam[] = [start];
-                let lightMap: { [key: number]: any } = {};
-                while (queue.length > 0) {
-                    const beam = queue.pop()!;
-                    const beamKey = toStringLightBeam(beam);
-                    if (memory[beamKey]) {
-                        continue;
-                    }
-                    if (cache[beamKey]) {
-                        lightMap = { ...lightMap, ...cache[beamKey].lightMap };
-                        cache[beamKey].next.forEach((lb) => {
-                            const lbKey = toStringLightBeam(lb);
-                            if (!memory[lbKey]) {
-                                queue.push(lb);
-                            }
-                        });
-                    } else {
-                        const result = computeBeam(beam, map);
-                        lightMap = { ...lightMap, ...result.lightMap };
-                        result.next.forEach((lb) => {
-                            const lbKey = toStringLightBeam(lb);
-                            if (!memory[lbKey]) {
-                                queue.push(lb);
-                            }
-                        });
-                        cache[beamKey] = { ...beam, ...result };
-                    }
-                    memory[beamKey] = true;
-                }
-
-                counts.push({ key: toStringLightBeam(start), count: Object.keys(lightMap).length });
+                const lightMap = computeBeam(start, map, cache);
+                counts.push({ start, count: Object.keys(lightMap).length });
             }
         }
 
