@@ -18,8 +18,6 @@ interface BeamCache {
     [key: string]: { [key: number]: any };
 }
 
-type Split = Vector2 & { type: '-' | '|' };
-
 const addVector2 = (left: Vector2, right: Vector2): Vector2 => ({ x: left.x + right.x, y: left.y + right.y });
 const toStringVector2 = (vec: Vector2): string => `${vec.x},${vec.y}`;
 const toStringLightBeam = (lb: LightBeam): string => `${toStringVector2(lb.start)};${toStringVector2(lb.direction)}`;
@@ -101,70 +99,6 @@ const computeBeam2 = (map: string[][], start: LightBeam): LightMap => {
         }
     }
 
-    return lightMap;
-};
-
-const computeBeam = (
-    beam: LightBeam,
-    map: string[][],
-    cache: BeamCache /*, memory?: { [key: string]: any }*/
-): LightMap => {
-    //if (!memory) {
-    //    memory = {};
-    //}
-
-    const beamKey = toStringLightBeam(beam);
-    if (cache[beamKey]) {
-        return cache[beamKey];
-    }
-
-    //if (memory[beamKey]) {
-    //    return {};
-    //}
-
-    //memory[beamKey] = true;
-
-    let lightMap: LightMap = {};
-    let direction = { ...beam.direction };
-    let position = { ...beam.start };
-    while (true) {
-        position = addVector2(position, direction);
-        if (map[position.y] === undefined || map[position.y][position.x] === undefined) {
-            break;
-        }
-
-        lightMap[position.x * 1000 + position.y] = true;
-
-        const tile = map[position.y][position.x];
-        if (tile !== '.') {
-            // If travelling on Y axis and non dot is '|'
-            if (direction.y !== 0 && tile === '|') {
-                continue;
-            }
-
-            // If travelling on X axis and non dot is '-'
-            if (direction.x !== 0 && tile === '-') {
-                continue;
-            }
-
-            const beams = splitOrTurnBeamBeam(position, direction, tile);
-            if (beams.length === 0) {
-                break;
-            } else if (beams.length === 1) {
-                direction = beams[0].direction;
-            } else if (beams.length === 2) {
-                const leftLightMap = computeBeam(beams[0], map, cache /*, memory*/);
-                const rightLightMap = computeBeam(beams[1], map, cache /*, memory*/);
-                const innerLightMap = { ...leftLightMap, ...rightLightMap };
-                lightMap = { ...lightMap, ...innerLightMap };
-                break;
-            } else {
-                throw new Error('WTF!');
-            }
-        }
-    }
-
-    cache[beamKey] = lightMap;
     return lightMap;
 };
 
