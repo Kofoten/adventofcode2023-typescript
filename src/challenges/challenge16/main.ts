@@ -14,15 +14,11 @@ interface LightMap {
     [key: number]: any;
 }
 
-interface BeamCache {
-    [key: string]: { [key: number]: any };
-}
-
 const addVector2 = (left: Vector2, right: Vector2): Vector2 => ({ x: left.x + right.x, y: left.y + right.y });
 const toStringVector2 = (vec: Vector2): string => `${vec.x},${vec.y}`;
 const toStringLightBeam = (lb: LightBeam): string => `${toStringVector2(lb.start)};${toStringVector2(lb.direction)}`;
 
-const splitOrTurnBeamBeam = (position: Vector2, direction: Vector2, object: string): LightBeam[] => {
+const splitOrTurnBeam = (position: Vector2, direction: Vector2, object: string): LightBeam[] => {
     const beams: LightBeam[] = [];
     switch (object) {
         case '/':
@@ -61,7 +57,7 @@ const splitOrTurnBeamBeam = (position: Vector2, direction: Vector2, object: stri
     return beams;
 };
 
-const computeBeam2 = (map: string[][], start: LightBeam): LightMap => {
+const computeBeam = (map: string[][], start: LightBeam): LightMap => {
     const lightMap: LightMap = {};
 
     const memory: string[] = [];
@@ -90,7 +86,7 @@ const computeBeam2 = (map: string[][], start: LightBeam): LightMap => {
 
         memory.push(toStringLightBeam(beam));
         if (map[position.y] !== undefined && map[position.y][position.x] !== undefined) {
-            splitOrTurnBeamBeam(position, beam.direction, map[position.y][position.x]).forEach((lb) => {
+            splitOrTurnBeam(position, beam.direction, map[position.y][position.x]).forEach((lb) => {
                 const lbStr = toStringLightBeam(lb);
                 if (!memory.some((m) => m === lbStr)) {
                     queue.push(lb);
@@ -125,7 +121,7 @@ const challenge: Challenge = {
             .map((line) => line.split(''));
 
         const start = { start: { x: -1, y: 0 }, direction: { x: 1, y: 0 } };
-        const lightMap = computeBeam2(map, start);
+        const lightMap = computeBeam(map, start);
         return Object.keys(lightMap).length.toString();
     },
     part2: (input: string): string => {
@@ -151,7 +147,7 @@ const challenge: Challenge = {
         const lightMapCache: { [key: string]: LightMap } = {};
         for (let i = 0; i < splitBeams.length; i++) {
             const beamKey = toStringLightBeam(splitBeams[i]);
-            const lightMap = computeBeam2(map, splitBeams[i]);
+            const lightMap = computeBeam(map, splitBeams[i]);
             lightMapCache[beamKey] = lightMap;
         }
 
@@ -182,7 +178,7 @@ const challenge: Challenge = {
                             continue;
                         }
 
-                        const beams = splitOrTurnBeamBeam(position, direction, tile);
+                        const beams = splitOrTurnBeam(position, direction, tile);
                         if (beams.length === 0) {
                             break;
                         } else if (beams.length === 1) {
